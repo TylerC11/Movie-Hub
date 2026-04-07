@@ -4,7 +4,7 @@ using Movie_Hub.Models;
 
 namespace Movie_Hub.Services;
 
-public class MovieService
+public class MovieService : IMovieService
 {
     private readonly ImdbContext _context;
 

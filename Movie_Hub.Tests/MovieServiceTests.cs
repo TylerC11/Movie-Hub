@@ -7,6 +7,7 @@ using Movie_Hub.Services;
 namespace Movie_Hub.Tests;
 
 [TestClass]
+[DoNotParallelize]
 public class MovieServiceTests
 {
     private ImdbContext GetContext()
