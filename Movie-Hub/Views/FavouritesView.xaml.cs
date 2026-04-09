@@ -16,7 +16,7 @@ namespace Movie_Hub.Views
     /// <summary>
     /// Interaction logic for FavouritesView.xaml
     /// </summary>
-    public partial class FavouritesView : Page
+    public partial class FavouritesView : UserControl
     {
         public FavouritesView()
         {

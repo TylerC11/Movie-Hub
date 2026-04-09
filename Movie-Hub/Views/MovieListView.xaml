@@ -1,13 +1,12 @@
-﻿<Page x:Class="Movie_Hub.Views.MovieListView"
+﻿<UserControl x:Class="Movie_Hub.Views.MovieListView"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       mc:Ignorable="d"
-      d:DesignHeight="720" d:DesignWidth="1080"
-      Title="MovieListView">
+      d:DesignHeight="720" d:DesignWidth="1080">
 
-    <Page.Resources>
+    <UserControl.Resources>
         <SolidColorBrush x:Key="BgDark"       Color="#0F0F0F"/>
         <SolidColorBrush x:Key="BgCard"       Color="#1A1A2E"/>
         <SolidColorBrush x:Key="BgFilter"     Color="#16213E"/>
@@ -109,7 +108,7 @@
             <Setter Property="Margin"          Value="6"/>
             <Setter Property="Cursor"          Value="Hand"/>
         </Style>
-    </Page.Resources>
+    </UserControl.Resources>
 
     <Grid Background="{StaticResource BgDark}">
         <Grid.RowDefinitions>
@@ -137,9 +136,6 @@
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-
-                    <!-- FIX: Style attribute removed. BasedOn in child element inherits InputStyle.
-                         This resolves the "Style set more than once" error. -->
                     <TextBox Width="280"
                              Text="{Binding SearchText, Mode=TwoWay,
                                             UpdateSourceTrigger=PropertyChanged}">
@@ -269,7 +265,6 @@
 
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <!-- DataContext = Title (EF entity) -->
                             <Border Width="190" Margin="6">
                                 <Border.Style>
                                     <Style TargetType="Border" BasedOn="{StaticResource CardStyle}">
@@ -289,7 +284,6 @@
                                 </Border.InputBindings>
 
                                 <StackPanel>
-                                    <!-- Poster placeholder -->
                                     <Border Background="#0E0E28" Height="260" CornerRadius="8,8,0,0">
                                         <TextBlock Text="🎬" FontSize="40"
                                                    HorizontalAlignment="Center"
@@ -298,10 +292,6 @@
                                     </Border>
 
                                     <StackPanel Margin="10,8,10,10">
-
-                                        <!-- FIX: MaxLines replaced with MaxHeight="36".
-                                             MaxLines is UWP-only and does not exist in WPF.
-                                             36px ≈ 2 lines at FontSize 13 with standard line height. -->
                                         <TextBlock Text="{Binding PrimaryTitle}"
                                                    Foreground="{StaticResource TextPrimary}"
                                                    FontSize="13" FontWeight="SemiBold"
@@ -311,7 +301,6 @@
                                                    TextWrapping="Wrap"
                                                    ToolTip="{Binding PrimaryTitle}"/>
 
-                                        <!-- Title.StartYear · Title.RuntimeMinutes -->
                                         <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
                                             <TextBlock Text="{Binding StartYear}"
                                                        Foreground="{StaticResource TextMuted}"
@@ -329,14 +318,12 @@
                                             </TextBlock>
                                         </StackPanel>
 
-                                        <!-- Genre badge + Rating -->
                                         <Grid Margin="0,6,0,0">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="*"/>
                                                 <ColumnDefinition Width="Auto"/>
                                             </Grid.ColumnDefinitions>
 
-                                            <!-- First genre from ICollection<Genre> -->
                                             <Border Grid.Column="0"
                                                     Background="#0E0E28"
                                                     CornerRadius="4" Padding="6,2"
@@ -346,7 +333,6 @@
                                                            Text="{Binding Genres[0].Name, FallbackValue='–'}"/>
                                             </Border>
 
-                                            <!-- Title.Rating.AverageRating (decimal?) -->
                                             <StackPanel Grid.Column="1"
                                                         Orientation="Horizontal"
                                                         VerticalAlignment="Center">
@@ -385,4 +371,4 @@
         </Border>
 
     </Grid>
-</Page>
+</UserControl>

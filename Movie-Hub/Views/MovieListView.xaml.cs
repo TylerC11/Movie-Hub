@@ -16,7 +16,7 @@ namespace Movie_Hub.Views
     /// <summary>
     /// Interaction logic for MovieListView.xaml
     /// </summary>
-    public partial class MovieListView : Page
+    public partial class MovieListView : UserControl
     {
         public MovieListView()
         {

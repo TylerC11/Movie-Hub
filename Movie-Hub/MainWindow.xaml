@@ -4,8 +4,6 @@
         xmlns:views="clr-namespace:Movie_Hub.Views"
         Title="Movie Hub" Height="720" Width="1280"
         WindowStartupLocation="CenterScreen">
-
-    <Grid>
-        <Frame x:Name="MainFrame" NavigationUIVisibility="Hidden"/>
-    </Grid>
+    <Frame x:Name="MainFrame" NavigationUIVisibility="Hidden"
+           Source="/Views/MainWindow.xaml"/>
 </Window>
