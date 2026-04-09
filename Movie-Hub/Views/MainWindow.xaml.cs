@@ -16,7 +16,7 @@ namespace Movie_Hub.Views
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Page
+    public partial class MainWindow : UserControl
     {
         public MainWindow()
         {

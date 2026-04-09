@@ -1,5 +1,4 @@
-﻿using System.Windows.Controls;
-using Movie_Hub.Commands;
+﻿using Movie_Hub.Commands;
 using Movie_Hub.Models;
 using Movie_Hub.Services;
 using Movie_Hub.Views;
@@ -13,12 +12,11 @@ namespace Movie_Hub.ViewModels
         private readonly IGenreService _genreService;
 
         // ── Backing fields ─────────────────────────────────────────────────
-        private Page _currentPage = null!;
+        private object _currentPage = null!;
         private string _currentRoute = string.Empty;
 
         // ── Properties ─────────────────────────────────────────────────────
-
-        public Page CurrentPage
+        public object CurrentPage
         {
             get => _currentPage;
             private set => SetProperty(ref _currentPage, value);
@@ -31,13 +29,11 @@ namespace Movie_Hub.ViewModels
         }
 
         // ── Commands ───────────────────────────────────────────────────────
-
         public RelayCommand NavigateHomeCommand { get; }
         public RelayCommand NavigateFavouritesCommand { get; }
         public RelayCommand NavigateDetailsCommand { get; }
 
         // ── Constructor ────────────────────────────────────────────────────
-
         public MainViewModel(IMovieService movieService, IGenreService genreService)
         {
             _movieService = movieService;
@@ -52,11 +48,9 @@ namespace Movie_Hub.ViewModels
         }
 
         // ── Private helpers ────────────────────────────────────────────────
-
         private void NavigateTo(string route, object? parameter = null)
         {
             CurrentRoute = route;
-
             CurrentPage = route switch
             {
                 "home" => new MovieListView
@@ -66,19 +60,14 @@ namespace Movie_Hub.ViewModels
                         _genreService,
                         NavigateDetailsCommand)
                 },
-
                 "favourites" => new FavouritesView
                 {
                     DataContext = new FavouritesViewModel()
                 },
-
-                // Pass the Title directly as DataContext until
-                // MovieDetailsViewModel is fully implemented.
                 "details" when parameter is Title title => new MovieDetailsView
                 {
                     DataContext = title
                 },
-
                 _ => new MovieListView
                 {
                     DataContext = new MovieListViewModel(

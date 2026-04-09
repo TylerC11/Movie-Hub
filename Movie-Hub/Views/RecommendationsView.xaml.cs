@@ -16,7 +16,7 @@ namespace Movie_Hub.Views
     /// <summary>
     /// Interaction logic for RecommendationsView.xaml
     /// </summary>
-    public partial class RecommendationsView : Page
+    public partial class RecommendationsView : UserControl
     {
         public RecommendationsView()
         {
