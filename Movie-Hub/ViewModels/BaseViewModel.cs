@@ -1,17 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Collections.ObjectModel;
-
+using System.Windows;
 
 namespace Movie_Hub.ViewModels
 {
-    /// <summary>
-    /// Base class for all ViewModels.
-    /// Provides INotifyPropertyChanged so WPF bindings update automatically.
-    /// </summary>
     public class BaseViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -26,6 +18,22 @@ namespace Movie_Hub.ViewModels
             field = value;
             OnPropertyChanged(propertyName);
             return true;
+        }
+
+        protected bool SetProperty<T>(ref T field, T value, Action onChanged,
+            [CallerMemberName] string? propertyName = null)
+        {
+            if (!SetProperty(ref field, value, propertyName)) return false;
+            onChanged();
+            return true;
+        }
+
+        protected static void RunOnUI(Action action)
+        {
+            if (Application.Current?.Dispatcher is { } d && !d.CheckAccess())
+                d.Invoke(action);
+            else
+                action();
         }
     }
 }

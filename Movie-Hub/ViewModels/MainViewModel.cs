@@ -7,15 +7,14 @@ namespace Movie_Hub.ViewModels
 {
     public class MainViewModel : BaseViewModel
     {
-        // ── Services ───────────────────────────────────────────────────────
         private readonly IMovieService _movieService;
         private readonly IGenreService _genreService;
 
-        // ── Backing fields ─────────────────────────────────────────────────
         private object _currentPage = null!;
         private string _currentRoute = string.Empty;
 
-        // ── Properties ─────────────────────────────────────────────────────
+        public FavouritesViewModel FavouritesVm { get; } = new();
+
         public object CurrentPage
         {
             get => _currentPage;
@@ -28,12 +27,11 @@ namespace Movie_Hub.ViewModels
             private set => SetProperty(ref _currentRoute, value);
         }
 
-        // ── Commands ───────────────────────────────────────────────────────
         public RelayCommand NavigateHomeCommand { get; }
         public RelayCommand NavigateFavouritesCommand { get; }
         public RelayCommand NavigateDetailsCommand { get; }
+        public RelayCommand AddFavouriteCommand { get; }
 
-        // ── Constructor ────────────────────────────────────────────────────
         public MainViewModel(IMovieService movieService, IGenreService genreService)
         {
             _movieService = movieService;
@@ -43,14 +41,17 @@ namespace Movie_Hub.ViewModels
             NavigateFavouritesCommand = new RelayCommand(_ => NavigateTo("favourites"));
             NavigateDetailsCommand = new RelayCommand(param => NavigateTo("details", param));
 
-            // Startup page
+            AddFavouriteCommand = new RelayCommand(
+                execute: param => FavouritesVm.Add(param as Title),
+                canExecute: param => param is Title t && !FavouritesVm.IsFavourite(t));
+
             NavigateTo("home");
         }
 
-        // ── Private helpers ────────────────────────────────────────────────
         private void NavigateTo(string route, object? parameter = null)
         {
             CurrentRoute = route;
+
             CurrentPage = route switch
             {
                 "home" => new MovieListView
@@ -58,23 +59,42 @@ namespace Movie_Hub.ViewModels
                     DataContext = new MovieListViewModel(
                         _movieService,
                         _genreService,
-                        NavigateDetailsCommand)
+                        NavigateDetailsCommand,
+                        AddFavouriteCommand)
                 },
+
                 "favourites" => new FavouritesView
                 {
-                    DataContext = new FavouritesViewModel()
+                    DataContext = FavouritesVm
                 },
-                "details" when parameter is Title title => new MovieDetailsView
-                {
-                    DataContext = title
-                },
+
+                "details" when parameter is Title title => CreateDetailsView(title),
+
                 _ => new MovieListView
                 {
                     DataContext = new MovieListViewModel(
                         _movieService,
                         _genreService,
-                        NavigateDetailsCommand)
+                        NavigateDetailsCommand,
+                        AddFavouriteCommand)
                 }
+            };
+        }
+
+        private MovieDetailsView CreateDetailsView(Title title)
+        {
+            var vm = new MovieDetailsViewModel(_movieService)
+            {
+                TitleId = title.TitleId,
+                NavigateBack = () => NavigateTo("home"),
+                AddToFavourites = () => FavouritesVm.Add(title)
+            };
+
+            vm.IsAlreadyFavourite = FavouritesVm.IsFavourite(title);
+
+            return new MovieDetailsView
+            {
+                DataContext = vm
             };
         }
     }

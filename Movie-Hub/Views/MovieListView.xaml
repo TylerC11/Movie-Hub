@@ -137,8 +137,7 @@
 
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                     <TextBox Width="280"
-                             Text="{Binding SearchText, Mode=TwoWay,
-                                            UpdateSourceTrigger=PropertyChanged}">
+                             Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                         <TextBox.Style>
                             <Style TargetType="TextBox" BasedOn="{StaticResource InputStyle}">
                                 <Style.Triggers>
@@ -160,7 +159,6 @@
                             </Style>
                         </TextBox.Style>
                     </TextBox>
-
                     <Button Style="{StaticResource GoldBtn}"
                             Content="Search"
                             Command="{Binding SearchCommand}"
@@ -276,15 +274,10 @@
                                         </Style.Triggers>
                                     </Style>
                                 </Border.Style>
-                                <Border.InputBindings>
-                                    <MouseBinding MouseAction="LeftClick"
-                                                  Command="{Binding DataContext.ViewDetailsCommand,
-                                                            RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                                  CommandParameter="{Binding}"/>
-                                </Border.InputBindings>
 
                                 <StackPanel>
-                                    <Border Background="#0E0E28" Height="260" CornerRadius="8,8,0,0">
+                                    <!-- Poster placeholder -->
+                                    <Border Background="#0E0E28" Height="240" CornerRadius="8,8,0,0">
                                         <TextBlock Text="🎬" FontSize="40"
                                                    HorizontalAlignment="Center"
                                                    VerticalAlignment="Center"
@@ -292,6 +285,7 @@
                                     </Border>
 
                                     <StackPanel Margin="10,8,10,10">
+                                        <!-- Title -->
                                         <TextBlock Text="{Binding PrimaryTitle}"
                                                    Foreground="{StaticResource TextPrimary}"
                                                    FontSize="13" FontWeight="SemiBold"
@@ -301,6 +295,7 @@
                                                    TextWrapping="Wrap"
                                                    ToolTip="{Binding PrimaryTitle}"/>
 
+                                        <!-- Year · Runtime -->
                                         <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
                                             <TextBlock Text="{Binding StartYear}"
                                                        Foreground="{StaticResource TextMuted}"
@@ -318,7 +313,8 @@
                                             </TextBlock>
                                         </StackPanel>
 
-                                        <Grid Margin="0,6,0,0">
+                                        <!-- Genre + Rating -->
+                                        <Grid Margin="0,6,0,6">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="*"/>
                                                 <ColumnDefinition Width="Auto"/>
@@ -339,17 +335,27 @@
                                                 <TextBlock Text="★" Foreground="#FFD700" FontSize="12"/>
                                                 <TextBlock Foreground="{StaticResource TextPrimary}"
                                                            FontSize="12" FontFamily="Segoe UI"
-                                                           Margin="2,0,0,0">
-                                                    <TextBlock.Text>
-                                                        <Binding Path="Rating.AverageRating"
-                                                                 StringFormat="{}{0:F1}"
-                                                                 FallbackValue="N/A"
-                                                                 TargetNullValue="N/A"/>
-                                                    </TextBlock.Text>
-                                                </TextBlock>
+                                                           Margin="2,0,0,0"
+                                                           Text="{Binding Rating.AverageRating, StringFormat={}{0:F1}, FallbackValue=N/A, TargetNullValue=N/A}"/>
                                             </StackPanel>
                                         </Grid>
 
+                                        <!-- View Details button -->
+                                        <Button Style="{StaticResource GhostBtn}"
+                                                Content="View Details"
+                                                HorizontalAlignment="Stretch"
+                                                Margin="0,0,0,4"
+                                                Command="{Binding DataContext.ViewDetailsCommand,
+                                                          RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                CommandParameter="{Binding}"/>
+
+                                        <!-- Add to Favourites button -->
+                                        <Button Style="{StaticResource GoldBtn}"
+                                                Content="★  Favourite"
+                                                HorizontalAlignment="Stretch"
+                                                Command="{Binding DataContext.AddFavouriteCommand,
+                                                          RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                CommandParameter="{Binding}"/>
                                     </StackPanel>
                                 </StackPanel>
                             </Border>

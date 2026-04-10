@@ -6,99 +6,208 @@
       mc:Ignorable="d"
       d:DesignHeight="720" d:DesignWidth="1080">
 
-    <Grid Background="#0F0F0F">
+    <UserControl.Resources>
+        <SolidColorBrush x:Key="BgDark"      Color="#0F0F0F"/>
+        <SolidColorBrush x:Key="BgCard"      Color="#1A1A2E"/>
+        <SolidColorBrush x:Key="AccentGold"  Color="#E2B96F"/>
+        <SolidColorBrush x:Key="TextPrimary" Color="#F5F5F5"/>
+        <SolidColorBrush x:Key="TextMuted"   Color="#9E9E9E"/>
+        <SolidColorBrush x:Key="BorderSubtle" Color="#2A2A4A"/>
+
+        <Style x:Key="GoldBtn" TargetType="Button">
+            <Setter Property="Background"    Value="{StaticResource AccentGold}"/>
+            <Setter Property="Foreground"    Value="#0F0F0F"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize"      Value="13"/>
+            <Setter Property="FontWeight"    Value="SemiBold"/>
+            <Setter Property="FontFamily"    Value="Segoe UI"/>
+            <Setter Property="Padding"       Value="16,8"/>
+            <Setter Property="Cursor"        Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bd" Background="{TemplateBinding Background}"
+                                CornerRadius="4" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="#F0C97E"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="bd" Property="Background" Value="#444"/>
+                                <Setter Property="Foreground" Value="#777"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="GhostBtn" TargetType="Button">
+            <Setter Property="Background"      Value="Transparent"/>
+            <Setter Property="Foreground"      Value="{StaticResource AccentGold}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize"        Value="14"/>
+            <Setter Property="FontFamily"      Value="Segoe UI"/>
+            <Setter Property="Padding"         Value="0"/>
+            <Setter Property="Cursor"          Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <TextBlock x:Name="tb"
+                                   Text="{TemplateBinding Content}"
+                                   Foreground="{TemplateBinding Foreground}"
+                                   FontSize="{TemplateBinding FontSize}"
+                                   FontFamily="{TemplateBinding FontFamily}"/>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="tb" Property="TextDecorations" Value="Underline"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Background="{StaticResource BgDark}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <!-- Header with Back Button -->
-        <Border Grid.Row="0" Background="#16213E" Padding="20">
-            <Button Content="← Back to Movies"
+        <Border Grid.Row="0" Background="#16213E" Padding="24,16">
+            <Button Style="{StaticResource GhostBtn}"
+                    Content="← Back to Movies"
                     Command="{Binding NavigateBackCommand}"
-                    Background="Transparent"
-                    Foreground="#E2B96F"
-                    BorderThickness="0"
-                    Cursor="Hand"
-                    HorizontalAlignment="Left"
-                    FontSize="14"/>
+                    HorizontalAlignment="Left"/>
         </Border>
 
-        <!-- Content Area -->
-        <ScrollViewer Grid.Row="1" Padding="20">
-            <StackPanel>
+        <!-- Content -->
+        <ScrollViewer Grid.Row="1"
+                      VerticalScrollBarVisibility="Auto"
+                      Padding="32,24">
+            <StackPanel MaxWidth="800" HorizontalAlignment="Left">
 
-                <!-- Loading State -->
-                <StackPanel Visibility="{Binding IsLoading}">
-                    <TextBlock Text="Movie details"
-                               Foreground="White"
-                               HorizontalAlignment="Center"
-                               FontSize="16"/>
-                </StackPanel>
+                <TextBlock Text="Loading…"
+                    Foreground="{StaticResource TextMuted}"
+                    FontSize="14" FontFamily="Segoe UI">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsLoading}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
 
-                <!-- Error State -->
-                <StackPanel Visibility="{Binding HasError}">
-                    <TextBlock Text="{Binding ErrorMessage}"
-                               Foreground="Red"
-                               FontSize="14"
-                               HorizontalAlignment="Center"/>
-                </StackPanel>
+                <!-- Error -->
+                <TextBlock Text="{Binding ErrorMessage}"
+                           Foreground="#E05252"
+                           FontSize="13" FontFamily="Segoe UI"/>
 
-                <!-- Movie Details -->
-                <StackPanel>
+                <!-- Title -->
+                <TextBlock Text="{Binding Movie.PrimaryTitle}"
+                           Foreground="{StaticResource TextPrimary}"
+                           FontSize="30" FontWeight="Bold" FontFamily="Segoe UI"
+                           TextWrapping="Wrap"/>
 
-                    <!-- Title -->
-                    <TextBlock Text="{Binding Movie.PrimaryTitle}"
-                               Foreground="White"
-                               FontSize="28"
-                               FontWeight="Bold"/>
-
-                    <!-- Year -->
+                <!-- Year · Runtime -->
+                <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
                     <TextBlock Text="{Binding Movie.StartYear}"
-                               Foreground="#888"
-                               FontSize="14"
-                               Margin="0,10,0,0"/>
-
-                    <!-- Rating -->
-                    <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                        <TextBlock Text="★ " Foreground="#E2B96F" FontSize="14"/>
-                        <TextBlock Text="{Binding Movie.Rating.AverageRating}" Foreground="#E2B96F" FontSize="14"/>
-                    </StackPanel>
-
-                    <!-- Genres -->
-                    <TextBlock Text="Genres" Foreground="#E2B96F" FontSize="16" FontWeight="SemiBold" Margin="0,20,0,10"/>
-                    <ItemsControl ItemsSource="{Binding Genres}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Border Background="#1A1A2E" CornerRadius="4" Padding="8,4" Margin="0,0,0,5">
-                                    <TextBlock Text="{Binding Name}" Foreground="#E2B96F"/>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-
-                    <!-- Cast -->
-                    <TextBlock Text="Cast" Foreground="#E2B96F" FontSize="16" FontWeight="SemiBold" Margin="0,20,0,10"/>
-
-                    <TextBlock Text="{Binding Cast.Count, StringFormat='Cast count: {0}'}"
-                               Foreground="Yellow"
-                               FontSize="12"
-                               Margin="0,0,0,10"/>
-
-                    <ItemsControl ItemsSource="{Binding Cast}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Border Background="#1A1A2E" CornerRadius="6" Padding="10,8" Margin="0,0,0,5">
-                                    <StackPanel>
-                                        <TextBlock Text="{Binding Name}" Foreground="White" FontWeight="SemiBold"/>
-                                        <TextBlock Text="{Binding CharacterName}" Foreground="#888" FontSize="12" Margin="0,4,0,0"/>
-                                    </StackPanel>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-
+                               Foreground="{StaticResource TextMuted}"
+                               FontSize="14" FontFamily="Segoe UI"/>
+                    <TextBlock Text=" · "
+                               Foreground="{StaticResource TextMuted}"
+                               FontSize="14"/>
+                    <TextBlock Foreground="{StaticResource TextMuted}"
+                               FontSize="14" FontFamily="Segoe UI">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat="{}{0} min">
+                                <Binding Path="Movie.RuntimeMinutes" TargetNullValue="N/A"/>
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
                 </StackPanel>
+
+                <!-- Rating -->
+                <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                    <TextBlock Text="★ "
+                               Foreground="{StaticResource AccentGold}"
+                               FontSize="16"/>
+                    <TextBlock Foreground="{StaticResource AccentGold}"
+                               FontSize="16" FontFamily="Segoe UI" FontWeight="SemiBold"
+                               Text="{Binding Movie.Rating.AverageRating, StringFormat={}{0:F1}, FallbackValue=N/A, TargetNullValue=N/A}"/>
+                    <TextBlock Foreground="{StaticResource TextMuted}"
+                               FontSize="13" FontFamily="Segoe UI"
+                               Margin="6,0,0,0" VerticalAlignment="Center"
+                               Text="{Binding Movie.Rating.NumVotes, StringFormat=({0:N0} votes), FallbackValue='', TargetNullValue=''}"/>
+                </StackPanel>
+
+                <!-- Add to Favourites button -->
+                <Button Style="{StaticResource GoldBtn}"
+                        Content="★  Add to Favourites"
+                        Command="{Binding AddFavouriteCommand}"
+                        HorizontalAlignment="Left"
+                        Margin="0,16,0,0"
+                        Padding="20,10"/>
+
+                <!-- Genres -->
+                <TextBlock Text="Genres"
+                           Foreground="{StaticResource AccentGold}"
+                           FontSize="16" FontWeight="SemiBold" FontFamily="Segoe UI"
+                           Margin="0,24,0,8"/>
+                <ItemsControl ItemsSource="{Binding Genres}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="{StaticResource BgCard}"
+                                    CornerRadius="4" Padding="10,4" Margin="0,0,6,6">
+                                <TextBlock Text="{Binding Name}"
+                                           Foreground="{StaticResource AccentGold}"
+                                           FontSize="12" FontFamily="Segoe UI"/>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <!-- Cast -->
+                <TextBlock Text="Cast"
+                           Foreground="{StaticResource AccentGold}"
+                           FontSize="16" FontWeight="SemiBold" FontFamily="Segoe UI"
+                           Margin="0,24,0,8"/>
+                <ItemsControl ItemsSource="{Binding Cast}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="{StaticResource BgCard}"
+                                    CornerRadius="6" Padding="12,10"
+                                    Margin="0,0,0,6"
+                                    BorderBrush="{StaticResource BorderSubtle}"
+                                    BorderThickness="1">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Name}"
+                                               Foreground="{StaticResource TextPrimary}"
+                                               FontWeight="SemiBold" FontFamily="Segoe UI"
+                                               FontSize="13"/>
+                                    <TextBlock Text="{Binding CharacterName}"
+                                               Foreground="{StaticResource TextMuted}"
+                                               FontSize="12" FontFamily="Segoe UI"
+                                               Margin="0,3,0,0"/>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
             </StackPanel>
         </ScrollViewer>
     </Grid>
