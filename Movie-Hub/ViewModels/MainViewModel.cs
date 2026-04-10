@@ -51,6 +51,7 @@ namespace Movie_Hub.ViewModels
         private void NavigateTo(string route, object? parameter = null)
         {
             CurrentRoute = route;
+
             CurrentPage = route switch
             {
                 "home" => new MovieListView
@@ -58,26 +59,42 @@ namespace Movie_Hub.ViewModels
                     DataContext = new MovieListViewModel(
                         _movieService,
                         _genreService,
-                        NavigateDetailsCommand)
+                        NavigateDetailsCommand,
+                        AddFavouriteCommand)
                 },
+
                 "favourites" => new FavouritesView
                 {
                     DataContext = FavouritesVm
                 },
-                "details" when parameter is Title title => new MovieDetailsView
-                {
-                    DataContext = new MovieDetailsViewModel(_movieService)
-                    {
-                        TitleId = title.TitleId
-                    }
-                },
+
+                "details" when parameter is Title title => CreateDetailsView(title),
+
                 _ => new MovieListView
                 {
                     DataContext = new MovieListViewModel(
                         _movieService,
                         _genreService,
-                        NavigateDetailsCommand)
+                        NavigateDetailsCommand,
+                        AddFavouriteCommand)
                 }
+            };
+        }
+
+        private MovieDetailsView CreateDetailsView(Title title)
+        {
+            var vm = new MovieDetailsViewModel(_movieService)
+            {
+                TitleId = title.TitleId,
+                NavigateBack = () => NavigateTo("home"),
+                AddToFavourites = () => FavouritesVm.Add(title)
+            };
+
+            vm.IsAlreadyFavourite = FavouritesVm.IsFavourite(title);
+
+            return new MovieDetailsView
+            {
+                DataContext = vm
             };
         }
     }

@@ -157,12 +157,8 @@
                                             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                                                 <TextBlock Text="★" Foreground="#FFD700" FontSize="12"/>
                                                 <TextBlock Foreground="{StaticResource TextPrimary}"
-                                                           FontSize="12" FontFamily="Segoe UI" Margin="2,0,0,0">
-                                                    <Binding Path="Rating.AverageRating"
-                                                             StringFormat="{}{0:F1}"
-                                                             FallbackValue="N/A"
-                                                             TargetNullValue="N/A"/>
-                                                </TextBlock>
+                                                           FontSize="12" FontFamily="Segoe UI" Margin="2,0,0,0"
+                                                           Text="{Binding Rating.AverageRating, StringFormat={}{0:F1}, FallbackValue=N/A, TargetNullValue=N/A}"/>
                                             </StackPanel>
                                         </Grid>
 
