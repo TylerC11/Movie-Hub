@@ -19,7 +19,7 @@ namespace Movie_Hub
             var sidebarPage = new Views.MainWindow();
             sidebarPage.DataContext = viewModel;
 
-            MainFrame.Navigate(sidebarPage);
+            MainFrame.Content = sidebarPage;
         }
     }
 }
