@@ -14,12 +14,10 @@ namespace Movie_Hub
             var context = new ImdbContext();
             var movieService = new MovieService(context);
             var genreService = new GenreService(context);
+            var recommendationService = new RecommendationService(context);
 
-            var viewModel = new MainViewModel(movieService, genreService);
-            var sidebarPage = new Views.MainWindow();
-            sidebarPage.DataContext = viewModel;
-
-            MainFrame.Content = sidebarPage;
+            var viewModel = new MainViewModel(movieService, genreService, recommendationService);
+            DataContext = viewModel;
         }
     }
 }

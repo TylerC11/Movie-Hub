@@ -3,10 +3,245 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:local="clr-namespace:Movie_Hub.Views"
       mc:Ignorable="d"
-      d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
+      d:DesignHeight="720" d:DesignWidth="1080">
 
+    <UserControl.Resources>
+        <SolidColorBrush x:Key="BgDark"       Color="#0F0F0F"/>
+        <SolidColorBrush x:Key="BgCard"       Color="#1A1A2E"/>
+        <SolidColorBrush x:Key="BgSidebar"    Color="#16213E"/>
+        <SolidColorBrush x:Key="AccentGold"   Color="#E2B96F"/>
+        <SolidColorBrush x:Key="TextPrimary"  Color="#F5F5F5"/>
+        <SolidColorBrush x:Key="TextMuted"    Color="#9E9E9E"/>
+        <SolidColorBrush x:Key="BorderSubtle" Color="#2A2A4A"/>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+
+        <Style x:Key="GoldBtn" TargetType="Button">
+            <Setter Property="Background"    Value="{StaticResource AccentGold}"/>
+            <Setter Property="Foreground"    Value="#0F0F0F"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize"      Value="13"/>
+            <Setter Property="FontWeight"    Value="SemiBold"/>
+            <Setter Property="FontFamily"    Value="Segoe UI"/>
+            <Setter Property="Padding"       Value="16,8"/>
+            <Setter Property="Cursor"        Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bd" Background="{TemplateBinding Background}"
+                                CornerRadius="4" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="#F0C97E"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="bd" Property="Background" Value="#444"/>
+                                <Setter Property="Foreground" Value="#777"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="CardStyle" TargetType="Border">
+            <Setter Property="Background"      Value="{StaticResource BgCard}"/>
+            <Setter Property="CornerRadius"    Value="8"/>
+            <Setter Property="BorderBrush"     Value="{StaticResource BorderSubtle}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Margin"          Value="6"/>
+            <Setter Property="Cursor"          Value="Hand"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Background="{StaticResource BgDark}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0" Background="{StaticResource BgSidebar}" Padding="28,20">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0"
+                           Text="✨  Recommended For You"
+                           Foreground="{StaticResource TextPrimary}"
+                           FontSize="22" FontWeight="Bold" FontFamily="Segoe UI"
+                           VerticalAlignment="Center"/>
+
+                <Button Grid.Column="1"
+                        Content="↻  Refresh"
+                        Command="{Binding RefreshCommand}"
+                        Style="{StaticResource GoldBtn}"
+                        VerticalAlignment="Center"/>
+            </Grid>
+        </Border>
+
+        <!-- Content -->
+        <Grid Grid.Row="1">
+
+            <!-- Loading -->
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"
+                        Visibility="{Binding IsLoading, Converter={StaticResource BoolToVis}}">
+                <ProgressBar IsIndeterminate="True" Width="200" Height="4"
+                             Foreground="{StaticResource AccentGold}" Background="#2A2A4A"/>
+                <TextBlock Text="Finding recommendations…"
+                           Foreground="{StaticResource TextMuted}" FontFamily="Segoe UI"
+                           HorizontalAlignment="Center" Margin="0,8,0,0"/>
+            </StackPanel>
+
+            <!-- Empty state -->
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding IsLoading}" Value="False"/>
+                                    <Condition Binding="{Binding Recommendations.Count}" Value="0"/>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </MultiDataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+                <TextBlock Text="🎬" FontSize="56" HorizontalAlignment="Center" Opacity="0.25"/>
+                <TextBlock Text="{Binding StatusMessage}"
+                           Foreground="{StaticResource TextMuted}"
+                           FontSize="15" FontFamily="Segoe UI"
+                           HorizontalAlignment="Center" Margin="0,16,0,0"
+                           TextWrapping="Wrap" MaxWidth="400" TextAlignment="Center"/>
+            </StackPanel>
+
+            <!-- Recommendations grid -->
+            <ScrollViewer VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled"
+                          Padding="18,16">
+                <ScrollViewer.Style>
+                    <Style TargetType="ScrollViewer">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding IsLoading}" Value="False"/>
+                                    <Condition Binding="{Binding Recommendations.Count}" Value="0"/>
+                                </MultiDataTrigger.Conditions>
+                                <!-- keep collapsed when empty -->
+                            </MultiDataTrigger>
+                            <DataTrigger Binding="{Binding IsLoading}" Value="False">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ScrollViewer.Style>
+
+                <ItemsControl ItemsSource="{Binding Recommendations}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Width="190" Margin="6">
+                                <Border.Style>
+                                    <Style TargetType="Border" BasedOn="{StaticResource CardStyle}">
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="BorderBrush" Value="{StaticResource AccentGold}"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+
+                                <StackPanel>
+                                    <Border Background="#0E0E28" Height="240" CornerRadius="8,8,0,0">
+                                        <TextBlock Text="🎬" FontSize="40"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center"
+                                                   Foreground="#333"/>
+                                    </Border>
+
+                                    <StackPanel Margin="10,8,10,10">
+                                        <TextBlock Text="{Binding PrimaryTitle}"
+                                                   Foreground="{StaticResource TextPrimary}"
+                                                   FontSize="13" FontWeight="SemiBold"
+                                                   FontFamily="Segoe UI"
+                                                   MaxHeight="36"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   TextWrapping="Wrap"
+                                                   ToolTip="{Binding PrimaryTitle}"/>
+
+                                        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                                            <TextBlock Text="{Binding StartYear}"
+                                                       Foreground="{StaticResource TextMuted}"
+                                                       FontSize="11" FontFamily="Segoe UI"/>
+                                            <TextBlock Text=" · " Foreground="{StaticResource TextMuted}" FontSize="11"/>
+                                            <TextBlock Foreground="{StaticResource TextMuted}"
+                                                       FontSize="11" FontFamily="Segoe UI">
+                                                <TextBlock.Text>
+                                                    <MultiBinding StringFormat="{}{0} min">
+                                                        <Binding Path="RuntimeMinutes" TargetNullValue="N/A"/>
+                                                    </MultiBinding>
+                                                </TextBlock.Text>
+                                            </TextBlock>
+                                        </StackPanel>
+
+                                        <Grid Margin="0,6,0,6">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <Border Grid.Column="0" Background="#0E0E28"
+                                                    CornerRadius="4" Padding="6,2" HorizontalAlignment="Left">
+                                                <TextBlock Foreground="{StaticResource AccentGold}"
+                                                           FontSize="10" FontFamily="Segoe UI"
+                                                           Text="{Binding Genres[0].Name, FallbackValue='–'}"/>
+                                            </Border>
+
+                                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                                <TextBlock Text="★" Foreground="#FFD700" FontSize="12"/>
+                                                <TextBlock Foreground="{StaticResource TextPrimary}"
+                                                           FontSize="12" FontFamily="Segoe UI" Margin="2,0,0,0"
+                                                           Text="{Binding Rating.AverageRating, StringFormat={}{0:F1}, FallbackValue=N/A, TargetNullValue=N/A}"/>
+                                            </StackPanel>
+                                        </Grid>
+
+                                        <Button Style="{StaticResource GoldBtn}"
+                                                Content="★  Favourite"
+                                                HorizontalAlignment="Stretch"
+                                                Command="{Binding DataContext.AddFavouriteCommand,
+                                                          RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                CommandParameter="{Binding}"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Grid>
+
+        <!-- Status bar -->
+        <Border Grid.Row="2"
+                Background="{StaticResource BgSidebar}"
+                BorderBrush="{StaticResource BorderSubtle}"
+                BorderThickness="0,1,0,0"
+                Padding="28,10">
+            <TextBlock Text="{Binding StatusMessage}"
+                       Foreground="{StaticResource TextMuted}"
+                       FontSize="12" FontFamily="Segoe UI"/>
+        </Border>
     </Grid>
 </UserControl>

@@ -37,6 +37,93 @@
             <Setter Property="Padding"       Value="8,6"/>
             <Setter Property="FontSize"      Value="13"/>
             <Setter Property="FontFamily"    Value="Segoe UI"/>
+            <Setter Property="ItemContainerStyle">
+                <Setter.Value>
+                    <Style TargetType="ComboBoxItem">
+                        <Setter Property="Background" Value="#1E1E3A"/>
+                        <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+                        <Setter Property="Padding"    Value="8,5"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsHighlighted" Value="True">
+                                <Setter Property="Background" Value="#2A2A4A"/>
+                                <Setter Property="Foreground" Value="{StaticResource AccentGold}"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="#2A2A4A"/>
+                                <Setter Property="Foreground" Value="{StaticResource AccentGold}"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <ToggleButton x:Name="ToggleButton"
+                                          Background="{TemplateBinding Background}"
+                                          BorderBrush="{TemplateBinding BorderBrush}"
+                                          BorderThickness="{TemplateBinding BorderThickness}"
+                                          Padding="{TemplateBinding Padding}"
+                                          IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                          Focusable="False" ClickMode="Press">
+                                <ToggleButton.Template>
+                                    <ControlTemplate TargetType="ToggleButton">
+                                        <Border x:Name="bd"
+                                                Background="{TemplateBinding Background}"
+                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                BorderThickness="{TemplateBinding BorderThickness}"
+                                                CornerRadius="4">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="20"/>
+                                                </Grid.ColumnDefinitions>
+                                                <ContentPresenter Grid.Column="0"
+                                                                  Margin="{TemplateBinding Padding}"
+                                                                  VerticalAlignment="Center"/>
+                                                <TextBlock Grid.Column="1" Text="▾"
+                                                           Foreground="#9E9E9E"
+                                                           VerticalAlignment="Center"
+                                                           HorizontalAlignment="Center"
+                                                           FontSize="10"/>
+                                            </Grid>
+                                        </Border>
+                                    </ControlTemplate>
+                                </ToggleButton.Template>
+                            </ToggleButton>
+                            <ContentPresenter x:Name="ContentSite"
+                                              IsHitTestVisible="False"
+                                              Content="{TemplateBinding SelectionBoxItem}"
+                                              ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                              Margin="10,0,24,0"
+                                              VerticalAlignment="Center"
+                                              HorizontalAlignment="Left"/>
+                            <Popup x:Name="Popup"
+                                   Placement="Bottom"
+                                   IsOpen="{TemplateBinding IsDropDownOpen}"
+                                   AllowsTransparency="True"
+                                   Focusable="False"
+                                   PopupAnimation="Slide">
+                                <Grid x:Name="DropDown"
+                                      SnapsToDevicePixels="True"
+                                      MinWidth="{TemplateBinding ActualWidth}"
+                                      MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                                    <Border x:Name="DropDownBorder"
+                                            Background="#1E1E3A"
+                                            BorderBrush="{StaticResource BorderSubtle}"
+                                            BorderThickness="1"
+                                            CornerRadius="4"/>
+                                    <ScrollViewer Margin="4,6,4,6" SnapsToDevicePixels="True">
+                                        <StackPanel IsItemsHost="True"
+                                                    KeyboardNavigation.DirectionalNavigation="Contained"/>
+                                    </ScrollViewer>
+                                </Grid>
+                            </Popup>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
 
         <Style x:Key="GoldBtn" TargetType="Button">
@@ -126,14 +213,11 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                    <TextBlock Text="MovieHub"
-                               Foreground="{StaticResource TextPrimary}"
-                               FontSize="24" FontWeight="Bold" FontFamily="Segoe UI"/>
-                    <TextBlock Text="Discover your favourite movies both old and new"
-                               Foreground="{StaticResource TextMuted}"
-                               FontSize="13" FontFamily="Segoe UI" Margin="0,2,0,0"/>
-                </StackPanel>
+                <TextBlock Grid.Column="0"
+                           Text="MovieHub"
+                           Foreground="{StaticResource TextPrimary}"
+                           FontSize="24" FontWeight="Bold" FontFamily="Segoe UI"
+                           VerticalAlignment="Center"/>
 
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                     <TextBox Width="280"
@@ -225,6 +309,18 @@
                             Foreground="{StaticResource AccentGold}"/>
                 </StackPanel>
 
+                <!-- Sort Order -->
+                <StackPanel Margin="0,0,20,0">
+                    <TextBlock Text="SORT BY RATING"
+                               Foreground="{StaticResource TextMuted}"
+                               FontSize="10" FontWeight="SemiBold" FontFamily="Segoe UI"
+                               Margin="0,0,0,4"/>
+                    <ComboBox Style="{StaticResource ComboStyle}"
+                              Width="160"
+                              ItemsSource="{Binding SortOptions}"
+                              SelectedItem="{Binding SelectedSortOption, Mode=TwoWay}"/>
+                </StackPanel>
+
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="4,0,0,0">
                     <Button Style="{StaticResource GoldBtn}"
                             Content="Apply Filters"
@@ -274,6 +370,14 @@
                                         </Style.Triggers>
                                     </Style>
                                 </Border.Style>
+
+                                <!-- Whole card is clickable -->
+                                <Border.InputBindings>
+                                    <MouseBinding MouseAction="LeftClick"
+                                                  Command="{Binding DataContext.ViewDetailsCommand,
+                                                            RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                  CommandParameter="{Binding}"/>
+                                </Border.InputBindings>
 
                                 <StackPanel>
                                     <!-- Poster placeholder -->
@@ -339,15 +443,6 @@
                                                            Text="{Binding Rating.AverageRating, StringFormat={}{0:F1}, FallbackValue=N/A, TargetNullValue=N/A}"/>
                                             </StackPanel>
                                         </Grid>
-
-                                        <!-- View Details button -->
-                                        <Button Style="{StaticResource GhostBtn}"
-                                                Content="View Details"
-                                                HorizontalAlignment="Stretch"
-                                                Margin="0,0,0,4"
-                                                Command="{Binding DataContext.ViewDetailsCommand,
-                                                          RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                                CommandParameter="{Binding}"/>
 
                                         <!-- Add to Favourites button -->
                                         <Button Style="{StaticResource GoldBtn}"

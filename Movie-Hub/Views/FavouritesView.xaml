@@ -7,6 +7,80 @@
              d:DesignHeight="720" d:DesignWidth="1080">
 
     <UserControl.Resources>
+        <SolidColorBrush x:Key="BgDark"       Color="#0F0F0F"/>
+        <SolidColorBrush x:Key="BgCard"       Color="#1A1A2E"/>
+        <SolidColorBrush x:Key="BgSidebar"    Color="#16213E"/>
+        <SolidColorBrush x:Key="AccentGold"   Color="#E2B96F"/>
+        <SolidColorBrush x:Key="TextPrimary"  Color="#F5F5F5"/>
+        <SolidColorBrush x:Key="TextMuted"    Color="#9E9E9E"/>
+        <SolidColorBrush x:Key="BorderSubtle" Color="#2A2A4A"/>
+
+        <Style x:Key="GhostBtn" TargetType="Button">
+            <Setter Property="Background"      Value="Transparent"/>
+            <Setter Property="Foreground"      Value="{StaticResource TextMuted}"/>
+            <Setter Property="BorderBrush"     Value="{StaticResource BorderSubtle}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontSize"        Value="13"/>
+            <Setter Property="FontWeight"      Value="SemiBold"/>
+            <Setter Property="FontFamily"      Value="Segoe UI"/>
+            <Setter Property="Padding"         Value="16,8"/>
+            <Setter Property="Cursor"          Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="#1E1E3A"/>
+                                <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="bd" Property="Background" Value="#333"/>
+                                <Setter Property="Foreground" Value="#555"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="DangerBtn" TargetType="Button">
+            <Setter Property="Background"      Value="Transparent"/>
+            <Setter Property="Foreground"      Value="#E05252"/>
+            <Setter Property="BorderBrush"     Value="#E05252"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontSize"        Value="12"/>
+            <Setter Property="FontWeight"      Value="SemiBold"/>
+            <Setter Property="FontFamily"      Value="Segoe UI"/>
+            <Setter Property="Padding"         Value="10,6"/>
+            <Setter Property="Cursor"          Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="#E05252"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <!-- Empty-state panel: visible only when HasFavourites is False -->
         <Style x:Key="EmptyPanelStyle" TargetType="StackPanel">
             <Setter Property="Visibility" Value="Collapsed"/>
@@ -43,15 +117,12 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                    <TextBlock Foreground="{StaticResource TextPrimary}"
-                               FontSize="22" FontWeight="Bold" FontFamily="Segoe UI">
-                        <Run Text="❤️  "/><Run Text="My Favourites"/>
-                    </TextBlock>
-                    <TextBlock Text="Movies you've saved this session"
-                               Foreground="{StaticResource TextMuted}"
-                               FontSize="13" FontFamily="Segoe UI" Margin="0,3,0,0"/>
-                </StackPanel>
+                <TextBlock Grid.Column="0"
+                           Foreground="{StaticResource TextPrimary}"
+                           FontSize="22" FontWeight="Bold" FontFamily="Segoe UI"
+                           VerticalAlignment="Center">
+                    <Run Text="❤️  "/><Run Text="My Favourites"/>
+                </TextBlock>
 
                 <Button Grid.Column="1"
                         Style="{StaticResource GhostBtn}"

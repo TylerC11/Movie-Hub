@@ -3,7 +3,72 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:views="clr-namespace:Movie_Hub.Views"
         Title="Movie Hub" Height="720" Width="1280"
-        WindowStartupLocation="CenterScreen">
-    <Frame x:Name="MainFrame" NavigationUIVisibility="Hidden"
-           Source="/Views/MainWindow.xaml"/>
+        WindowStartupLocation="CenterScreen"
+        Background="#0F0F0F">
+
+    <Window.Resources>
+        <SolidColorBrush x:Key="AccentGold"   Color="#E2B96F"/>
+        <SolidColorBrush x:Key="TextPrimary"  Color="#F5F5F5"/>
+        <SolidColorBrush x:Key="TextMuted"    Color="#9E9E9E"/>
+        <SolidColorBrush x:Key="BgNav"        Color="#0D0D1F"/>
+
+        <Style x:Key="NavBtn" TargetType="Button">
+            <Setter Property="Background"      Value="Transparent"/>
+            <Setter Property="Foreground"      Value="{StaticResource TextMuted}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize"        Value="13"/>
+            <Setter Property="FontWeight"      Value="SemiBold"/>
+            <Setter Property="FontFamily"      Value="Segoe UI"/>
+            <Setter Property="Padding"         Value="16,10"/>
+            <Setter Property="Cursor"          Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bd" Background="{TemplateBinding Background}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Foreground" Value="{StaticResource AccentGold}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Navigation bar -->
+        <Border Grid.Row="0" Background="{StaticResource BgNav}"
+                BorderBrush="#1A1A3A" BorderThickness="0,0,0,1">
+            <StackPanel Orientation="Horizontal" Margin="16,0">
+                <TextBlock Text="🎬 MovieHub"
+                           Foreground="{StaticResource AccentGold}"
+                           FontSize="16" FontWeight="Bold" FontFamily="Segoe UI"
+                           VerticalAlignment="Center" Margin="8,0,24,0"/>
+
+                <Button Style="{StaticResource NavBtn}"
+                        Content="🏠  Home"
+                        Command="{Binding NavigateHomeCommand}"/>
+
+                <Button Style="{StaticResource NavBtn}"
+                        Content="❤️  Favourites"
+                        Command="{Binding NavigateFavouritesCommand}"/>
+
+                <Button Style="{StaticResource NavBtn}"
+                        Content="✨  Recommendations"
+                        Command="{Binding NavigateRecommendationsCommand}"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Page content -->
+        <ContentPresenter Grid.Row="1" Content="{Binding CurrentPage}"/>
+    </Grid>
 </Window>

@@ -20,11 +20,18 @@ namespace Movie_Hub.ViewModels
         private double? _minRating = null;
         private bool _isLoading = false;
         private string _statusMessage = string.Empty;
+        private string _selectedSortOption = "Most Popular";
 
         public ObservableCollection<Title> Movies { get; } = new();
         public ObservableCollection<string> Genres { get; } = new();
 
-        // ── NEW: exposed so movie cards can bind to it ──────────────────────
+        public List<string> SortOptions { get; } = new()
+        {
+            "Most Popular",
+            "Rating: High to Low",
+            "Rating: Low to High"
+        };
+
         public RelayCommand AddFavouriteCommand { get; }
 
         public string SearchText
@@ -61,6 +68,12 @@ namespace Movie_Hub.ViewModels
             set => SetProperty(ref _minRating, value);
         }
 
+        public string SelectedSortOption
+        {
+            get => _selectedSortOption;
+            set => SetProperty(ref _selectedSortOption, value);
+        }
+
         public bool IsLoading
         {
             get => _isLoading;
@@ -78,17 +91,16 @@ namespace Movie_Hub.ViewModels
         public RelayCommand ClearCommand { get; }
         public RelayCommand ViewDetailsCommand => _navigateDetailsCommand;
 
-        // ── Updated constructor — takes AddFavouriteCommand from MainViewModel ──
         public MovieListViewModel(
             IMovieService movieService,
             IGenreService genreService,
             RelayCommand navigateDetailsCommand,
-            RelayCommand addFavouriteCommand)   // <-- NEW parameter
+            RelayCommand addFavouriteCommand)
         {
             _movieService = movieService;
             _genreService = genreService;
             _navigateDetailsCommand = navigateDetailsCommand;
-            AddFavouriteCommand = addFavouriteCommand;  // <-- store it
+            AddFavouriteCommand = addFavouriteCommand;
 
             SearchCommand = new RelayCommand(
                 execute: _ => ExecuteSearch(),
@@ -106,7 +118,7 @@ namespace Movie_Hub.ViewModels
             IsLoading = true;
             try
             {
-                var results = _movieService.GetPopularMovies(count: 50);
+                var results = _movieService.GetPopularMovies(count: 250);
                 RefreshMovies(results);
             }
             catch (Exception ex)
@@ -135,11 +147,19 @@ namespace Movie_Hub.ViewModels
             try
             {
                 double? ratingFilter = (MinRating is > 0) ? MinRating : null;
+
+                // Treat "All Genres" as no genre filter
+                string? genreFilter = (SelectedGenre == "All Genres" || string.IsNullOrEmpty(SelectedGenre))
+                    ? null
+                    : SelectedGenre;
+
                 var results = _movieService.FilterMovies(
-                    genre: SelectedGenre,
+                    genre: genreFilter,
                     yearFrom: YearFrom,
                     yearTo: YearTo,
-                    minRating: ratingFilter);
+                    minRating: ratingFilter,
+                    sortDescending: SelectedSortOption != "Rating: Low to High");
+
                 RefreshMovies(results);
             }
             catch (Exception ex) { StatusMessage = $"Filter error: {ex.Message}"; }
@@ -153,6 +173,7 @@ namespace Movie_Hub.ViewModels
             YearFrom = null;
             YearTo = null;
             MinRating = null;
+            SelectedSortOption = "Most Popular";
             LoadPopularMovies();
         }
 

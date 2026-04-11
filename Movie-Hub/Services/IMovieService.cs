@@ -5,10 +5,11 @@ namespace Movie_Hub.Services
 {
     public interface IMovieService
     {
-        List<Title> GetPopularMovies(int count = 50);
+        List<Title> GetPopularMovies(int count = 250);
         List<Title> SearchByTitle(string query);
         List<Title> FilterMovies(string? genre = null, int? yearFrom = null,
-                                 int? yearTo = null, double? minRating = null);
+                                 int? yearTo = null, double? minRating = null,
+                                 bool sortDescending = true);
         Title? GetMovieDetails(string titleId);
         List<Principal> GetCast(string titleId);
     }
