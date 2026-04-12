@@ -1,24 +1,23 @@
-﻿using System.Text;
+﻿using Movie_Hub.Data;
+using Movie_Hub.Services;
+using Movie_Hub.ViewModels;
+using Movie_Hub.Views;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Movie_Hub
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         public MainWindow()
         {
             InitializeComponent();
+            var context = new ImdbContext();
+            var movieService = new MovieService(context);
+            var genreService = new GenreService(context);
+            var recommendationService = new RecommendationService(context);
+
+            var viewModel = new MainViewModel(movieService, genreService, recommendationService);
+            DataContext = viewModel;
         }
     }
 }

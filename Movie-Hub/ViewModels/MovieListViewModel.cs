@@ -9,12 +9,10 @@ namespace Movie_Hub.ViewModels
 {
     public class MovieListViewModel : BaseViewModel
     {
-        // ── Services ───────────────────────────────────────────────────────
         private readonly IMovieService _movieService;
         private readonly IGenreService _genreService;
         private readonly RelayCommand _navigateDetailsCommand;
 
-        // ── Backing fields ─────────────────────────────────────────────────
         private string _searchText = string.Empty;
         private string? _selectedGenre = null;
         private int? _yearFrom = null;
@@ -22,13 +20,19 @@ namespace Movie_Hub.ViewModels
         private double? _minRating = null;
         private bool _isLoading = false;
         private string _statusMessage = string.Empty;
-
-        // ── Public collections ─────────────────────────────────────────────
+        private string _selectedSortOption = "Most Popular";
 
         public ObservableCollection<Title> Movies { get; } = new();
         public ObservableCollection<string> Genres { get; } = new();
 
-        // ── Filter properties ──────────────────────────────────────────────
+        public List<string> SortOptions { get; } = new()
+        {
+            "Most Popular",
+            "Rating: High to Low",
+            "Rating: Low to High"
+        };
+
+        public RelayCommand AddFavouriteCommand { get; }
 
         public string SearchText
         {
@@ -64,6 +68,12 @@ namespace Movie_Hub.ViewModels
             set => SetProperty(ref _minRating, value);
         }
 
+        public string SelectedSortOption
+        {
+            get => _selectedSortOption;
+            set => SetProperty(ref _selectedSortOption, value);
+        }
+
         public bool IsLoading
         {
             get => _isLoading;
@@ -76,23 +86,21 @@ namespace Movie_Hub.ViewModels
             private set => SetProperty(ref _statusMessage, value);
         }
 
-        // ── Commands ───────────────────────────────────────────────────────
-
         public RelayCommand SearchCommand { get; }
         public RelayCommand FilterCommand { get; }
         public RelayCommand ClearCommand { get; }
         public RelayCommand ViewDetailsCommand => _navigateDetailsCommand;
 
-        // ── Constructor ────────────────────────────────────────────────────
-
         public MovieListViewModel(
             IMovieService movieService,
             IGenreService genreService,
-            RelayCommand navigateDetailsCommand)
+            RelayCommand navigateDetailsCommand,
+            RelayCommand addFavouriteCommand)
         {
             _movieService = movieService;
             _genreService = genreService;
             _navigateDetailsCommand = navigateDetailsCommand;
+            AddFavouriteCommand = addFavouriteCommand;
 
             SearchCommand = new RelayCommand(
                 execute: _ => ExecuteSearch(),
@@ -105,44 +113,32 @@ namespace Movie_Hub.ViewModels
             LoadPopularMovies();
         }
 
-        // ── Service calls ──────────────────────────────────────────────────
-
         public void LoadPopularMovies()
         {
             IsLoading = true;
             try
             {
-                var results = _movieService.GetPopularMovies(count: 50);
+                var results = _movieService.GetPopularMovies(count: 250);
                 RefreshMovies(results);
             }
             catch (Exception ex)
             {
                 StatusMessage = $"Error loading movies: {ex.Message}";
             }
-            finally
-            {
-                IsLoading = false;
-            }
+            finally { IsLoading = false; }
         }
 
         public void ExecuteSearch()
         {
             if (string.IsNullOrWhiteSpace(SearchText)) return;
-
             IsLoading = true;
             try
             {
                 var results = _movieService.SearchByTitle(SearchText.Trim());
                 RefreshMovies(results);
             }
-            catch (Exception ex)
-            {
-                StatusMessage = $"Search error: {ex.Message}";
-            }
-            finally
-            {
-                IsLoading = false;
-            }
+            catch (Exception ex) { StatusMessage = $"Search error: {ex.Message}"; }
+            finally { IsLoading = false; }
         }
 
         public void ExecuteFilter()
@@ -150,26 +146,24 @@ namespace Movie_Hub.ViewModels
             IsLoading = true;
             try
             {
-                // Treat MinRating == 0 as "no filter" so the slider resting
-                // at zero doesn't exclude movies that have no rating set.
                 double? ratingFilter = (MinRating is > 0) ? MinRating : null;
 
+                // Treat "All Genres" as no genre filter
+                string? genreFilter = (SelectedGenre == "All Genres" || string.IsNullOrEmpty(SelectedGenre))
+                    ? null
+                    : SelectedGenre;
+
                 var results = _movieService.FilterMovies(
-                    genre: SelectedGenre,
+                    genre: genreFilter,
                     yearFrom: YearFrom,
                     yearTo: YearTo,
-                    minRating: ratingFilter);
+                    minRating: ratingFilter,
+                    sortDescending: SelectedSortOption != "Rating: Low to High");
 
                 RefreshMovies(results);
             }
-            catch (Exception ex)
-            {
-                StatusMessage = $"Filter error: {ex.Message}";
-            }
-            finally
-            {
-                IsLoading = false;
-            }
+            catch (Exception ex) { StatusMessage = $"Filter error: {ex.Message}"; }
+            finally { IsLoading = false; }
         }
 
         public void ExecuteClear()
@@ -179,10 +173,9 @@ namespace Movie_Hub.ViewModels
             YearFrom = null;
             YearTo = null;
             MinRating = null;
+            SelectedSortOption = "Most Popular";
             LoadPopularMovies();
         }
-
-        // ── Private helpers ────────────────────────────────────────────────
 
         private void LoadGenres()
         {
@@ -191,21 +184,15 @@ namespace Movie_Hub.ViewModels
                 var genres = _genreService.GetAllGenres();
                 Genres.Clear();
                 Genres.Add("All Genres");
-                foreach (var g in genres)
-                    Genres.Add(g);
+                foreach (var g in genres) Genres.Add(g);
             }
-            catch (Exception ex)
-            {
-                StatusMessage = $"Could not load genres: {ex.Message}";
-            }
+            catch (Exception ex) { StatusMessage = $"Could not load genres: {ex.Message}"; }
         }
 
         private void RefreshMovies(List<Title> results)
         {
             Movies.Clear();
-            foreach (var m in results)
-                Movies.Add(m);
-
+            foreach (var m in results) Movies.Add(m);
             StatusMessage = results.Count switch
             {
                 0 => "No results found — try adjusting your search or filters.",

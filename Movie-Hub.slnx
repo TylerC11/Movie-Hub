@@ -1,4 +1,6 @@
 <Solution>
   <Project Path="Movie-Hub/Movie-Hub.csproj" />
-  <Project Path="Movie_Hub.Tests/Movie_Hub.Tests.csproj" />
+  <Project Path="Movie_Hub.Tests/Movie_Hub.Tests.csproj">
+    <Build Solution="Debug|*" Project="false" />
+  </Project>
 </Solution>
