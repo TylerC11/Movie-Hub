@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Movie_Hub.Services
 {
-    // Fetches movie plot and cast from OMDb API when local database is missing data
+    // Fetches movie plot, cast, and poster from OMDb API when local database is missing data
     public class OmdbService
     {
         private readonly HttpClient _httpClient = new(); // Shared HTTP client for API requests
@@ -22,7 +22,7 @@ namespace Movie_Hub.Services
                 var value = plot.GetString();
                 return value == "null" ? null : value; // OMDb returns "null" when no plot exists
             }
-            return null; //null if unavailable
+            return null; // null if unavailable
         }
 
         // Returns a list of actors, directors, and writers for a movie by IMDB ID
@@ -60,7 +60,22 @@ namespace Movie_Hub.Services
             return result;
         }
 
-        // Calls the OMDb API and returns parsed JSON — shared by GetPlotAsync and GetCastAsync
+        // Returns the poster URL for a movie by IMDB ID
+        public async Task<string?> GetPosterAsync(string imdbId)
+        {
+            var json = await FetchAsync(imdbId);
+            if (json == null) return null;
+
+            if (json.RootElement.TryGetProperty("Poster", out var poster))
+            {
+                var value = poster.GetString();
+                return value == "N/A" ? null : value; // OMDb returns "N/A" when no poster exists
+            }
+
+            return null; // null if unavailable
+        }
+
+        // Calls the OMDb API and returns parsed JSON — shared by all fetch methods
         private async Task<JsonDocument?> FetchAsync(string imdbId)
         {
             try

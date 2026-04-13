@@ -21,6 +21,7 @@ namespace Movie_Hub.ViewModels
         private string _errorMessage;
         private bool _isAlreadyFavourite;
         private string? _plot;
+        private string? _posterUrl; // stores poster URL
 
         // Navigation
         public Action NavigateBack { get; set; }
@@ -39,6 +40,13 @@ namespace Movie_Hub.ViewModels
         {
             get => _plot;
             set => SetProperty(ref _plot, value);
+        }
+
+        // Poster URL from OMDb API
+        public string? PosterUrl
+        {
+            get => _posterUrl;
+            set => SetProperty(ref _posterUrl, value);
         }
 
         // Public properties for binding
@@ -106,6 +114,7 @@ namespace Movie_Hub.ViewModels
                 Cast.Clear();
                 Genres.Clear();
                 Plot = null;
+                PosterUrl = null; // reset poster
 
                 Movie = _movieService.GetMovieDetails(TitleId);
 
@@ -122,10 +131,6 @@ namespace Movie_Hub.ViewModels
                         Genres.Add(genre);
                 }
 
-                //// Load Picture
-                //if (Movie.Pictures != null && Movie.Pictures.Any())
-                //    Movie.PictureUrl = Movie.Pictures.First().Url;
-
                 // Load Cast from local database first
                 var castMembers = _movieService.GetCast(TitleId);
 
@@ -133,7 +138,7 @@ namespace Movie_Hub.ViewModels
                 {
                     foreach (var principal in castMembers)
                     {
-                        if (principal.Name == null) continue; // Skip entries with no name
+                        if (principal.Name == null) continue;
 
                         Cast.Add(new CastMemberDisplay
                         {
@@ -145,7 +150,7 @@ namespace Movie_Hub.ViewModels
                     }
                 }
 
-                // If no cast from database, fall back to OMDb for both cast and plot
+                // Load fallback data from OMDb (plot + poster always, cast only if needed)
                 if (Cast.Count == 0)
                     _ = LoadFromOmdbAsync(TitleId, loadCast: true, loadPlot: true);
                 else
@@ -161,11 +166,14 @@ namespace Movie_Hub.ViewModels
             }
         }
 
-        // Fetches plot and/or cast from OMDb API as a fallback
+        // Fetches plot, poster, and/or cast from OMDb API as a fallback
         private async Task LoadFromOmdbAsync(string imdbId, bool loadCast, bool loadPlot)
         {
             try
             {
+                // Fetch poster
+                PosterUrl = await _omdbService.GetPosterAsync(imdbId);
+
                 if (loadCast)
                 {
                     var omdbCast = await _omdbService.GetCastAsync(imdbId);
@@ -182,14 +190,6 @@ namespace Movie_Hub.ViewModels
                             });
                         }
                     }
-                    else
-                    {
-                        Cast.Add(new CastMemberDisplay
-                        {
-                            Name = "No cast information available",
-                            CharacterName = "This movie doesn't have cast data"
-                        });
-                    }
                 }
 
                 if (loadPlot)
@@ -200,13 +200,6 @@ namespace Movie_Hub.ViewModels
             }
             catch
             {
-                if (loadCast)
-                    Cast.Add(new CastMemberDisplay
-                    {
-                        Name = "Could not load cast",
-                        CharacterName = "Failed to fetch cast information"
-                    });
-
                 if (loadPlot)
                     Plot = "Could not load description.";
             }
