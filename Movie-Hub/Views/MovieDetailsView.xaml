@@ -91,12 +91,6 @@
                       Padding="32,24">
             <StackPanel MaxWidth="800" HorizontalAlignment="Left">
 
-                <!-- Movie Poster -->
-                <Image Width="200"
-                Height="300"
-                Margin="0,0,0,16"
-                Source="{Binding PosterUrl}" />
-
                 <!-- Loading indicator -->
                 <TextBlock Text="Loading…"
                     Foreground="{StaticResource TextMuted}"
@@ -118,61 +112,92 @@
                            Foreground="#E05252"
                            FontSize="13" FontFamily="Segoe UI"/>
 
-                <!-- Title -->
-                <TextBlock Text="{Binding Movie.PrimaryTitle}"
-                           Foreground="{StaticResource TextPrimary}"
-                           FontSize="30" FontWeight="Bold" FontFamily="Segoe UI"
-                           TextWrapping="Wrap"/>
+                <!-- Poster + Details side by side -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
 
-                <!-- Year · Runtime -->
-                <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
-                    <TextBlock Text="{Binding Movie.StartYear}"
-                               Foreground="{StaticResource TextMuted}"
-                               FontSize="14" FontFamily="Segoe UI"/>
-                    <TextBlock Text=" · "
-                               Foreground="{StaticResource TextMuted}"
-                               FontSize="14"/>
-                    <TextBlock Foreground="{StaticResource TextMuted}"
-                               FontSize="14" FontFamily="Segoe UI">
-                        <TextBlock.Text>
-                            <MultiBinding StringFormat="{}{0} min">
-                                <Binding Path="Movie.RuntimeMinutes" TargetNullValue="N/A"/>
-                            </MultiBinding>
-                        </TextBlock.Text>
-                    </TextBlock>
-                </StackPanel>
+                    <!-- Poster -->
+                    <Border Grid.Column="0"
+                            Width="200" Height="300"
+                            CornerRadius="8"
+                            Background="#0E0E28"
+                            Margin="0,0,24,0"
+                            VerticalAlignment="Top">
+                        <Grid>
+                            <TextBlock Text="🎬" FontSize="48"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       Foreground="#333"/>
+                            <Image Stretch="UniformToFill"
+                                   VerticalAlignment="Center"
+                                   Source="{Binding PosterUrl}"/>
+                        </Grid>
+                    </Border>
 
-                <!-- Rating -->
-                <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
-                    <TextBlock Text="★ "
-                               Foreground="{StaticResource AccentGold}"
-                               FontSize="16"/>
-                    <TextBlock Foreground="{StaticResource AccentGold}"
-                               FontSize="16" FontFamily="Segoe UI" FontWeight="SemiBold"
-                               Text="{Binding Movie.Rating.AverageRating, StringFormat={}{0:F1}, FallbackValue=N/A, TargetNullValue=N/A}"/>
-                    <TextBlock Foreground="{StaticResource TextMuted}"
-                               FontSize="13" FontFamily="Segoe UI"
-                               Margin="6,0,0,0" VerticalAlignment="Center"
-                               Text="{Binding Movie.Rating.NumVotes, StringFormat=({0:N0} votes), FallbackValue='', TargetNullValue=''}"/>
-                </StackPanel>
+                    <!-- Details column -->
+                    <StackPanel Grid.Column="1" VerticalAlignment="Top">
 
-                <!-- Add to Favourites button — disables and changes text once added -->
-                <Button HorizontalAlignment="Left"
-                        Margin="0,16,0,0"
-                        Padding="20,10"
-                        Command="{Binding AddToFavouritesCommand}">
-                    <Button.Style>
-                        <Style TargetType="Button" BasedOn="{StaticResource GoldBtn}">
-                            <Setter Property="Content" Value="★  Add to Favourites"/>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsAlreadyFavourite}" Value="True">
-                                    <Setter Property="Content" Value="✓  Added to Favourites"/>
-                                    <Setter Property="IsEnabled" Value="False"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style>
-                </Button>
+                        <!-- Title -->
+                        <TextBlock Text="{Binding Movie.PrimaryTitle}"
+                                   Foreground="{StaticResource TextPrimary}"
+                                   FontSize="30" FontWeight="Bold" FontFamily="Segoe UI"
+                                   TextWrapping="Wrap"/>
+
+                        <!-- Year · Runtime -->
+                        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                            <TextBlock Text="{Binding Movie.StartYear}"
+                                       Foreground="{StaticResource TextMuted}"
+                                       FontSize="14" FontFamily="Segoe UI"/>
+                            <TextBlock Text=" · "
+                                       Foreground="{StaticResource TextMuted}"
+                                       FontSize="14"/>
+                            <TextBlock Foreground="{StaticResource TextMuted}"
+                                       FontSize="14" FontFamily="Segoe UI">
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="{}{0} min">
+                                        <Binding Path="Movie.RuntimeMinutes" TargetNullValue="N/A"/>
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                        </StackPanel>
+
+                        <!-- Rating -->
+                        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                            <TextBlock Text="★ "
+                                       Foreground="{StaticResource AccentGold}"
+                                       FontSize="16"/>
+                            <TextBlock Foreground="{StaticResource AccentGold}"
+                                       FontSize="16" FontFamily="Segoe UI" FontWeight="SemiBold"
+                                       Text="{Binding Movie.Rating.AverageRating, StringFormat={}{0:F1}, FallbackValue=N/A, TargetNullValue=N/A}"/>
+                            <TextBlock Foreground="{StaticResource TextMuted}"
+                                       FontSize="13" FontFamily="Segoe UI"
+                                       Margin="6,0,0,0" VerticalAlignment="Center"
+                                       Text="{Binding Movie.Rating.NumVotes, StringFormat=({0:N0} votes), FallbackValue='', TargetNullValue=''}"/>
+                        </StackPanel>
+
+                        <!-- Add to Favourites button -->
+                        <Button HorizontalAlignment="Left"
+                                Margin="0,16,0,0"
+                                Padding="20,10"
+                                Command="{Binding AddToFavouritesCommand}">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource GoldBtn}">
+                                    <Setter Property="Content" Value="★  Add to Favourites"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsAlreadyFavourite}" Value="True">
+                                            <Setter Property="Content" Value="✓  Added to Favourites"/>
+                                            <Setter Property="IsEnabled" Value="False"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+
+                    </StackPanel>
+                </Grid>
 
                 <!-- Genres -->
                 <TextBlock Text="Genres"
