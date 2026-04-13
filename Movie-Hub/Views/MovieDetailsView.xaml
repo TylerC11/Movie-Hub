@@ -79,27 +79,33 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
 
-                    <!-- Cast -->
-                    <TextBlock Text="Cast" Foreground="#E2B96F" FontSize="16" FontWeight="SemiBold" Margin="0,20,0,10"/>
-
-                    <!-- Show count of cast members -->
-                    <TextBlock Text="{Binding Cast.Count, StringFormat='Cast count: {0}'}"
-                                Foreground="Yellow" 
-                                FontSize="12" 
-                                Margin="0,0,0,10"/>
-                    
-                    <ItemsControl ItemsSource="{Binding Cast}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Border Background="#1A1A2E" CornerRadius="6" Padding="10,8" Margin="0,0,0,5">
-                                    <StackPanel>
-                                        <TextBlock Text="{Binding Name}" Foreground="White" FontWeight="SemiBold"/>
-                                        <TextBlock Text="{Binding CharacterName}" Foreground="#888" FontSize="12" Margin="0,4,0,0"/>
-                                    </StackPanel>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
+                <!-- Cast -->
+                <TextBlock Text="Cast"
+                           Foreground="{StaticResource AccentGold}"
+                           FontSize="16" FontWeight="SemiBold" FontFamily="Segoe UI"
+                           Margin="0,24,0,8"/>
+                <ItemsControl ItemsSource="{Binding Cast}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="{StaticResource BgCard}"
+                                    CornerRadius="6" Padding="12,10"
+                                    Margin="0,0,0,6"
+                                    BorderBrush="{StaticResource BorderSubtle}"
+                                    BorderThickness="1">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Name}"
+                                               Foreground="{StaticResource TextPrimary}"
+                                               FontWeight="SemiBold" FontFamily="Segoe UI"
+                                               FontSize="13"/>
+                                    <TextBlock Text="{Binding CharacterName}"
+                                               Foreground="{StaticResource TextMuted}"
+                                               FontSize="12" FontFamily="Segoe UI"
+                                               Margin="0,3,0,0"/>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
 
                 </StackPanel>
             </StackPanel>
