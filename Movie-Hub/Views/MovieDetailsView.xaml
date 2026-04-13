@@ -91,6 +91,7 @@
                       Padding="32,24">
             <StackPanel MaxWidth="800" HorizontalAlignment="Left">
 
+                <!-- Loading indicator -->
                 <TextBlock Text="Loading…"
                     Foreground="{StaticResource TextMuted}"
                     FontSize="14" FontFamily="Segoe UI">
@@ -149,13 +150,23 @@
                                Text="{Binding Movie.Rating.NumVotes, StringFormat=({0:N0} votes), FallbackValue='', TargetNullValue=''}"/>
                 </StackPanel>
 
-                <!-- Add to Favourites button -->
-                <Button Style="{StaticResource GoldBtn}"
-                        Content="★  Add to Favourites"
-                        Command="{Binding AddFavouriteCommand}"
-                        HorizontalAlignment="Left"
+                <!-- Add to Favourites button — disables and changes text once added -->
+                <Button HorizontalAlignment="Left"
                         Margin="0,16,0,0"
-                        Padding="20,10"/>
+                        Padding="20,10"
+                        Command="{Binding AddToFavouritesCommand}">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource GoldBtn}">
+                            <Setter Property="Content" Value="★  Add to Favourites"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsAlreadyFavourite}" Value="True">
+                                    <Setter Property="Content" Value="✓  Added to Favourites"/>
+                                    <Setter Property="IsEnabled" Value="False"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
 
                 <!-- Genres -->
                 <TextBlock Text="Genres"
@@ -179,6 +190,23 @@
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
+
+                <!-- Description -->
+                <TextBlock Text="Description"
+                           Foreground="{StaticResource AccentGold}"
+                           FontSize="16" FontWeight="SemiBold" FontFamily="Segoe UI"
+                           Margin="0,24,0,8"/>
+                <Border Background="{StaticResource BgCard}"
+                        CornerRadius="6" Padding="16,12"
+                        BorderBrush="{StaticResource BorderSubtle}"
+                        BorderThickness="1">
+                    <TextBlock Text="{Binding Plot, FallbackValue='Loading description...'}"
+                               Foreground="{StaticResource TextPrimary}"
+                               FontSize="13" FontFamily="Segoe UI"
+                               TextWrapping="Wrap"
+                               LineHeight="20"
+                               Opacity="0.85"/>
+                </Border>
 
                 <!-- Cast -->
                 <TextBlock Text="Cast"

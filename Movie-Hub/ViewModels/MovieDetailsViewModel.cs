@@ -122,6 +122,10 @@ namespace Movie_Hub.ViewModels
                         Genres.Add(genre);
                 }
 
+                //// Load Picture
+                //if (Movie.Pictures != null && Movie.Pictures.Any())
+                //    Movie.PictureUrl = Movie.Pictures.First().Url;
+
                 // Load Cast from local database first
                 var castMembers = _movieService.GetCast(TitleId);
 
